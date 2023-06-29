@@ -29,7 +29,6 @@ PARSER.add_argument(
 )
 
 
-
 ARGS = PARSER.parse_args()
 
 
@@ -43,47 +42,44 @@ ls.check_connection()
 
 project = ls.get_project(22)
 
+
 def read_and_encode(filename):
     with open(filename, "rb") as f:
         encoded_string = base64.b64encode(f.read())
     return encoded_string.decode("utf-8")
 
+
 next_data = pd.read_csv(ARGS.data_path)
 
 start = 0
 finish = 100
-split_data = [] 
+split_data = []
 
-for i in range(round(len(next_data)/100)):
-
+for i in range(round(len(next_data) / 100)):
     split = next_data[start:finish]
     split_data.append(split)
 
     start = finish
-    finish = finish+100
+    finish = finish + 100
 
 
 for data_sample in tqdm(split_data):
-    
-    
     for idx, image in data_sample.iterrows():
         image = read_and_encode(image["path"])
 
         task = {
-                    "data": {
-                        "image": f"data:image/jpeg;base64,{image}",
-                        "idx": str(idx),
-                        "lat": data_sample["lat"][idx],
-                        "long": data_sample["long"][idx],
-                        "image_type": data_sample["image_type"][idx].astype(str),
-                        "path": data_sample["path"][idx]
-                        }
-                    }
+            "data": {
+                "image": f"data:image/jpeg;base64,{image}",
+                "idx": str(idx),
+                "lat": data_sample["lat"][idx],
+                "long": data_sample["long"][idx],
+                "image_type": data_sample["image_type"][idx].astype(str),
+                "path": data_sample["path"][idx],
+            }
+        }
 
-        project.import_tasks(
-            [task]
-        )
+        project.import_tasks([task])
 
     time.sleep(60)
 
-print('==== FINISHED ====')
+print("==== FINISHED ====")

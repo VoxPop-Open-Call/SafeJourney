@@ -15,15 +15,23 @@ import random
 sess = tf.compat.v1.Session()
 
 SEED = 42
+
+
 def reset_seeds():
     tf.random.set_seed(SEED)
     np.random.seed(SEED)
-    os.environ['PYTHONHASHSEED'] = str(SEED)
+    os.environ["PYTHONHASHSEED"] = str(SEED)
     random.seed(SEED)
 
 
-def plot_roc(train_to_eval, labels_to_eval, prob_list_to_eval, task_classes, task_to_eval, nbr_classes):
-
+def plot_roc(
+    train_to_eval,
+    labels_to_eval,
+    prob_list_to_eval,
+    task_classes,
+    task_to_eval,
+    nbr_classes,
+):
     label_binarizer = LabelBinarizer().fit(train_to_eval)
     y_onehot_test = label_binarizer.transform(labels_to_eval)
     y_a_preds = prob_list_to_eval
@@ -37,7 +45,7 @@ def plot_roc(train_to_eval, labels_to_eval, prob_list_to_eval, task_classes, tas
     for i, color in zip(range(nbr_classes), colors):
         class_of_interest = task_classes[task_to_eval][i]
         class_id = np.flatnonzero(label_binarizer.classes_ == class_of_interest)[0]
-        #class_id
+        # class_id
 
         RocCurveDisplay.from_predictions(
             y_onehot_test[:, class_id],
@@ -46,7 +54,7 @@ def plot_roc(train_to_eval, labels_to_eval, prob_list_to_eval, task_classes, tas
             color=color,
             ax=ax,
         )
-        
+
     plt.plot([0, 1], [0, 1], "k--", label="chance level (AUC = 0.5)")
     plt.axis("square")
     plt.xlabel("False Positive Rate")
@@ -57,17 +65,18 @@ def plot_roc(train_to_eval, labels_to_eval, prob_list_to_eval, task_classes, tas
 
     return
 
+
 def plot_metrics(history, train, val, metric):
     plt.plot(history[train])
     plt.plot(history[val])
     plt.title(train)
     plt.ylabel(metric)
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    plt.xlabel("epoch")
+    plt.legend(["train", "test"], loc="upper left")
     plt.show()
 
-def focal_loss(gamma=2., alpha=4.):
 
+def focal_loss(gamma=2.0, alpha=4.0):
     gamma = float(gamma)
     alpha = float(alpha)
 
@@ -88,37 +97,38 @@ def focal_loss(gamma=2., alpha=4.):
         Returns:
             [tensor] -- loss.
         """
-        epsilon = 1.e-9
+        epsilon = 1.0e-9
         y_true = tf.convert_to_tensor(y_true, tf.float32)
         y_pred = tf.convert_to_tensor(y_pred, tf.float32)
 
         model_out = tf.math.add(y_pred, epsilon)
         ce = tf.math.multiply(y_true, -tf.math.log(model_out))
-        weight = tf.math.multiply(y_true, tf.math.pow(tf.subtract(1., model_out), gamma))
+        weight = tf.math.multiply(
+            y_true, tf.math.pow(tf.subtract(1.0, model_out), gamma)
+        )
         fl = tf.math.multiply(alpha, tf.math.multiply(weight, ce))
         reduced_fl = tf.reduce_max(fl, axis=1)
         return tf.reduce_mean(reduced_fl)
+
     return focal_loss_fixed
 
 
 def get_config_yaml(config_path):
-    with open(config_path, 'r') as file:
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
 
-def build_model(output_shapes: dict, input_shape=(224, 224, 3), dropout_rate = 0.4):
-     # inputs
+
+def build_model(output_shapes: dict, input_shape=(224, 224, 3), dropout_rate=0.4):
+    # inputs
     input_image = layers.Input(shape=input_shape)
-    ipt_image = layers.Lambda(lambda x : tf.image.resize(x, (448, 448)))(input_image)
-    
+    ipt_image = layers.Lambda(lambda x: tf.image.resize(x, (448, 448)))(input_image)
+
     base_model = tf.keras.applications.MobileNetV2(
-        input_shape=(448,448,3), 
-        include_top = False,
-        weights='imagenet', 
-        pooling='max'
+        input_shape=(448, 448, 3), include_top=False, weights="imagenet", pooling="max"
     )
     base_model.trainable = False
-    
+
     x = base_model(ipt_image)
     # Add dense layers after max pooling
     x = layers.Dense(200, activation="relu")(x)
@@ -131,31 +141,33 @@ def build_model(output_shapes: dict, input_shape=(224, 224, 3), dropout_rate = 0
         x = layers.Dense(50, activation="relu")(shareable_output)
         x = layers.Dropout(dropout_rate)(x)
         outputs.append(layers.Dense(shape, activation="softmax", name=task)(x))
-        
-    model = tf.keras.Model(input_image, outputs, name="Mobile-Net")        
+
+    model = tf.keras.Model(input_image, outputs, name="Mobile-Net")
 
     return model
 
 
 class DataGenDepth(tf.keras.utils.Sequence):
-    def __init__(self, dataframe,
-                 task_classes,
-                 relative_path='',
-                 batch_size=16,
-                 image_path_column="path",
-                 shuffle=True,
-                 seed=1,
-                 augmentation=False
-                 ):
+    def __init__(
+        self,
+        dataframe,
+        task_classes,
+        relative_path="",
+        batch_size=16,
+        image_path_column="path",
+        shuffle=True,
+        seed=1,
+        augmentation=False,
+    ):
         self.dataframe = dataframe
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.seed = seed
         self.task_classes = task_classes
-        self.image_path_column = image_path_column 
+        self.image_path_column = image_path_column
         self.relative_path = relative_path
-    
-        self.le = {k: LabelEncoder().fit(v) for k, v in self.task_classes.items()} 
+
+        self.le = {k: LabelEncoder().fit(v) for k, v in self.task_classes.items()}
         self.augmentation = augmentation
 
         self.n = len(self.dataframe)
@@ -163,71 +175,70 @@ class DataGenDepth(tf.keras.utils.Sequence):
     def on_epoch_end(self):
         if self.shuffle:
             self.dataframe = self.dataframe.sample(
-                frac=1, random_state = self.seed
+                frac=1, random_state=self.seed
             ).reset_index(drop=True)
 
     def __getitem__(self, index):
-        batches = self.dataframe[index * self.batch_size:(index + 1) * self.batch_size]
-        ret = self.__get_data(batches)        
+        batches = self.dataframe[
+            index * self.batch_size : (index + 1) * self.batch_size
+        ]
+        ret = self.__get_data(batches)
         return ret
 
     def __len__(self):
         return self.n // self.batch_size
 
     def __get_input(self, path):
-        image = tf.keras.preprocessing.image.load_img(os.path.join(self.relative_path, path))
-        
+        image = tf.keras.preprocessing.image.load_img(
+            os.path.join(self.relative_path, path)
+        )
 
         image = tf.keras.preprocessing.image.img_to_array(image)
-        image = tf.image.resize(image, (448,448))
+        image = tf.image.resize(image, (448, 448))
 
         image_arr = tf.keras.applications.mobilenet_v2.preprocess_input(image)
 
         if self.augmentation:
+            data_augmentation = tf.keras.Sequential([layers.RandomFlip("horizontal")])
 
-            data_augmentation = tf.keras.Sequential([
-                layers.RandomFlip("horizontal")
-                ])
-            
             image_arr = data_augmentation(image_arr)
 
-            #image_arr = tf.keras.preprocessing.image.random_rotation(
+            # image_arr = tf.keras.preprocessing.image.random_rotation(
             #    image_arr, 20, fill_mode="nearest",
             #    row_axis=0, col_axis=1, channel_axis=2
-            #)
-            #image_arr = tf.keras.preprocessing.image.random_shift(
+            # )
+            # image_arr = tf.keras.preprocessing.image.random_shift(
             #    image_arr, 0.2, 0.2, fill_mode="nearest",
             #    row_axis=0, col_axis=1, channel_axis=2
-            #)
-                #print(type(image_arr))
+            # )
+            # print(type(image_arr))
         if type(image_arr).__module__ != np.__name__:
-
             # with sess.as_default():
 
             #     return image_arr.eval()
             return image_arr.numpy()
         else:
             return image_arr
-        #return image_arr
+        # return image_arr
 
     def __get_output(self, label, task):
         label = self.le[task].transform([label])
-        return tf.keras.utils.to_categorical(label, len(self.task_classes[task])).ravel()
+        return tf.keras.utils.to_categorical(
+            label, len(self.task_classes[task])
+        ).ravel()
 
     def __get_data(self, batches):
-        
         image_paths = batches[self.image_path_column]
-        
+
         X_batch = np.asarray([self.__get_input(x) for x in image_paths])
 
-        y_batch={}
+        y_batch = {}
 
         for key in self.task_classes.keys():
-            y_batch[key] = np.asarray([self.__get_output(x,key) for x in batches[key]])
-            
-        
-        #print("DEBUG: ",y_batch)
+            y_batch[key] = np.asarray([self.__get_output(x, key) for x in batches[key]])
 
-        #y_batch = {k: np.asarray([self.__get_output(x, k) for x in batches[k]])}
+        # print("DEBUG: ",y_batch)
+
+        # y_batch = {k: np.asarray([self.__get_output(x, k) for x in batches[k]])}
 
         return X_batch, y_batch
