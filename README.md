@@ -1,7 +1,6 @@
 # Voxpop
-![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_EU_ERDF.png?raw=true)
-![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_UIA_couleur_Aplat.png?raw=true)
-![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/VoxPop_Horizontal_White.png?raw=true)
+<img src="https://github.com/nilg-ai/voxpop-nilgai/blob/dev/figures/all_logos.png" data-canonical-src="https://github.com/nilg-ai/voxpop-nilgai/blob/dev/figures/all_logos.png" width="900" height="300" />
+
 
 The existence of multiple barriers to mobility deprive a lot of wheelchair users of following a certain path on the street. Currently, wheelchair users need to carefully plan the path they need to take ahead of time. 
 
