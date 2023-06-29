@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "voxpop-api"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-14jbjtmu5g1f9"
+s3_prefix = "voxpop-api"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["AppFunction=918995689715.dkr.ecr.us-east-1.amazonaws.com/samapp7427b055/appfunction10acf256repo"]

@@ -1,0 +1,25 @@
+categories:
+  sidewalk_width: ["sufficient", "insufficient"]
+  crosswalk_level: ["none", "ramp", "small_step"]
+
+training_parameters:
+  batch_size: 16
+  max_epochs: 100
+  learning_rate: 0.00001
+  train_test_split: [0.7, 0.3]
+  patience: 10 
+  verbose: 0
+
+new_categories:
+  temporary_obstacles: ["none", "car"]
+
+tasks:
+  sidewalk_level: ["no_steps", "has_steps", "multiple_steps"]
+  sidewalk_width: ["sufficient_width", "insufficient_width"]
+  crosswalk_level: ["ramp", "small_step", "big_step"]
+  pavement_type: ["irregular", "plain"]
+
+
+data_file_path: 'annotated_data/asiful_new_tasks2.csv'
+train_val_output_folder: 'models/third_iters/obstacles/'
+model_output: 'models/third_iters/obstacles'

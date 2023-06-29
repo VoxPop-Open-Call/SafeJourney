@@ -1,0 +1,11 @@
+fastapi==0.67.0
+mangum==0.11.0
+pandas==1.4.2
+pymongo==4.1.1
+dnspython==2.2.1
+shapely==2.0.0
+geopy==2.3.0
+openrouteservice==2.3.3
+folium==0.14.0
+numpy==1.23.5
+geopandas==0.13.0
