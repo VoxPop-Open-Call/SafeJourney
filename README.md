@@ -1,4 +1,4 @@
-# Voxpop
+# VoxPop - SafeJourney by NILG.AI 
 <img src="https://github.com/nilg-ai/voxpop-nilgai/blob/dev/figures/all_logos.png" data-canonical-src="https://github.com/nilg-ai/voxpop-nilgai/blob/dev/figures/all_logos.png" width="900" height="250" />
 
 
