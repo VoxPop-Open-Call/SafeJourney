@@ -1,5 +1,7 @@
 # Voxpop
-![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/cross_side_model.png?raw=true)
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_EU_ERDF.png?raw=true)
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_UIA_couleur_Aplat.png?raw=true)
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/VoxPop_Horizontal_White.png?raw=true)
 
 The existence of multiple barriers to mobility deprive a lot of wheelchair users of following a certain path on the street. Currently, wheelchair users need to carefully plan the path they need to take ahead of time. 
 
@@ -15,6 +17,17 @@ SafeJourney uses satellite, street and geographical data to calculate an accessi
 … among other indicators
 
 This accessibility index is going to be calculated for thousands of points in the city of Lisbon, providing information about what regions are friendlier for users in wheelchairs. On the long term, this solution can be used not only by wheelchair users directly but by service providers (e.g. restaurants/real estate) to give more detailed information about the region to these users.
+
+## Project deliverables
+The resulting data and trained models used in this project can be found in our google drive. The following items are available:
+ 
+ - [Report creation with accessibility index](https://drive.google.com/file/d/1CRvu5JxV80WyZJukyj8KrbL5rUPDz1B0/view?usp=sharing)
+ - [Heatmap of city with accessibility score](https://drive.google.com/file/d/1yveIcSuKKenoy8ZCRMQYAr_5n8qV2lII/view?usp=sharing)
+ - [Demo application landing](https://nilg.ai/safejourney)
+ - [Annotated data for the crosswalks and sidewalks](https://drive.google.com/file/d/1T8SsasRYjv03d9j0nOlv2GnXImh20VWj/view?usp=sharing)
+ - [Annotated data for the temporary obstacles](https://drive.google.com/file/d/1k_7LGPD19b274uG7TTOW8v033F8OQPuD/view?usp=sharing)
+ - [Grid scores (source of the accessibility score)](https://drive.google.com/file/d/14Hz-LR7WJgfHs42fLqXzWXnngZk6zuD9/view?usp=sharing)
+ - [Individual scores for the extracted points](https://drive.google.com/file/d/1rZZ5SpJFaS3SDnGfkSsVzE0DbVf5cJ0W/view?usp=sharing)
 
 ## Model Preparation
 Here we will describe how we performed each task to prepare and train our computer vision model, and how you can replicate it.
@@ -259,18 +272,18 @@ scores = [route.score for route in routes]
 main_route = routes[np.argmax(scores)]
 alt_routes = [routes[idx] for idx, score in enumerate(scores) if idx != np.argmax(scores)]
 
-
+```
 ## API
 To run the API, we deployed a docker image into an AWS Lambda. The code for the API is in [this folder](api). To deploy your solution, you must run these two lines:
-
 ```bash
 sam build
-
 sam deploy --guided
 ```
 For the API documentation, can refer to https://github.com/nilg-ai/voxpop_demo   
 
 ## Licenses
-
 This code is released under CC BY-ND 4.0
 This project is co-financed by the European Regional Development Fund through the Urban Innovative Actions Initiative
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_EU_ERDF.png?raw=true)
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/Logo_UIA_couleur_Aplat.png?raw=true)
+![img](https://github.com/nilg-ai/voxpop/blob/dev/figures/VoxPop_Horizontal_White.png?raw=true)
