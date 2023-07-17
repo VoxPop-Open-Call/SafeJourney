@@ -1,0 +1,5 @@
+tasks:
+  sidewalk_level: ["no_steps", "has_steps", "multiple_steps"]
+  sidewalk_width: ["sufficient_width", "insufficient_width"]
+  crosswalk_level: ["ramp", "small_step", "big_step"]
+  pavement_type: ["irregular", "plain"]

@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  demo
+
+Resources:
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 120
+      MemorySize: 2048
+      CodeUri: app/
+      PackageType: Image
+      Events:
+        ApiEvent:
+          Properties:
+              RestApiId:
+                  Ref: FastapiExampleGateway
+              Path: /{proxy+}
+              Method: ANY
+          Type: Api
+    Metadata:
+      Dockerfile: Dockerfile.lambda
+      DockerContext: .
+      
+  FastapiExampleGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+        StageName: prod
+        OpenApiVersion: '3.0.0'
+        # Timeout: 30
+
+
+Outputs:
+  Api:
+    Description: "API Gateway endpoint URL for Prod stage for App function"
+    Value: !Sub "https://${FastapiExampleGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  #ApiKey:
+  #  Description: "You can find your API Key in the AWS console: (Put in the request HEADER as 'x-api-key')"
+  #  Value: !Sub "https://console.aws.amazon.com/apigateway/home?region=${AWS::Region}#/api-keys/${FastapiExampleGatewayApiKey}"
+
+  # https://github.com/aws/serverless-application-model/issues/1514
+  # https://stackoverflow.com/questions/52936126/how-to-enable-apikeyrequired-property-in-sam-without-explicit-swagger-definiti 
